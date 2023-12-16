@@ -1,4 +1,9 @@
 #include "M5Atom.h"
+#include <WiFi.h>
+#include <time.h>
+
+const char* ssid       = "Yakki_LAN4";
+const char* password   = "yakkirin311";
 
 void setup()
 {
@@ -7,10 +12,16 @@ void setup()
     for(int i=0; i<25; i++){
       M5.dis.drawpix(i, 0xa0a0a0);
     }
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  configTime(9 * 3600L, 0, "ntp.nict.jp", "time.google.com", "ntp.jst.mfeed.ad.jp");
+
 }
 
 uint8_t FSM = 1;
-//uint8_t brightness = 2;
 uint8_t d = 1;
 
 
@@ -67,52 +78,21 @@ void led_pattern(int pattern)
 
 void loop()
 {
+  struct tm timeInfo;
+  getLocalTime(&timeInfo);
 
+  uint8_t sec = timeInfo.tm_sec ;
+  FSM = sec % 2 + 1 ;
   led_pattern(FSM);
 
-    if (M5.Btn.wasPressed())
-    {
-//
-//        switch (FSM)
+//    if (M5.Btn.wasPressed())
+//    {
+//        FSM++;
+//        if (FSM >= 3)
 //        {
-//        case 0:
-//            for(int i=0; i<25; i++){
-//              M5.dis.drawpix(i, 0xf00000);
-//            }
-//            break;
-//        case 1:
-//            for(int i=0; i<25; i++){
-//              M5.dis.drawpix(i, 0x00f000);
-//            }
-//            break;
-//        case 2:
-//            for(int i=0; i<25; i++){
-//              M5.dis.drawpix(i, 0x000aff);
-//            }
-//            break;
-//        case 3:
-//            for(int i=0; i<25; i++){
-//              M5.dis.drawpix(i, 0xa0a0a0);
-//            }
-//            break;
-//        default:
-//            break;
+//            FSM = 1;
 //        }
-        FSM++;
-        if (FSM >= 3)
-        {
-            FSM = 1;
-        }
-    }
-
-//    brightness = brightness + d;
-//    if ( brightness > 30) {
-//      d = -1;
 //    }
-//    if ( brightness < 3) {
-//      d = 1;
-//    }
-//    M5.dis.setBrightness(brightness);
 
     delay(50);
     M5.update();
